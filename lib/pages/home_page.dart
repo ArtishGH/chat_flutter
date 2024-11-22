@@ -49,23 +49,47 @@ class HomePage extends StatelessWidget {
 
   Widget _buildUserListItem(
       Map<String, dynamic> userData, BuildContext context) {
-    // display all users except currently logged in
-    if (userData["email"] != _authService.getCurrentUser()!.email) {
-      return UserTile(
-        text: userData["email"],
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  receiverEmail: userData["email"],
-                  receiverID: userData["uid"],
-                ),
-              ));
-        },
-      );
-    } else {
+    // Skip the currently logged-in user
+    if (userData["email"] == _authService.getCurrentUser()!.email) {
       return Container();
     }
+
+    return FutureBuilder<String?>(
+      future: _chatService.getLastMessage(userData["uid"]),
+      builder: (context, snapshot) {
+        String lastMessage = snapshot.connectionState == ConnectionState.waiting
+            ? "Loading..."
+            : snapshot.data ?? "No messages yet";
+        bool noMessagesYet = snapshot.data == null;
+        return FutureBuilder(
+          future: _chatService.getLastMessageUser(userData["uid"]),
+          builder: (context, snapshot) {
+            String lastMessageUserID = "Unknown";
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.data != null) {
+              lastMessageUserID = snapshot.data ?? "Unknown";
+            }
+            return UserTile(
+              text: userData["email"],
+              subtitle: lastMessage,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      receiverEmail: userData["email"],
+                      receiverID: userData["uid"],
+                    ),
+                  ),
+                );
+              },
+              lastMessageUserID: lastMessageUserID,
+              receiverID: userData["uid"],
+              noMessagesYet: noMessagesYet,
+            );
+          },
+        );
+      },
+    );
   }
 }

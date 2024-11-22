@@ -5,13 +5,27 @@ import '../themes/theme_provider.dart';
 
 class UserTile extends StatelessWidget {
   final String text;
+  final String subtitle;
   final void Function()? onTap;
+  final String lastMessageUserID;
+  final String receiverID;
+  final bool noMessagesYet;
 
-  const UserTile({super.key, required this.text, required this.onTap});
+  const UserTile(
+      {super.key,
+      required this.text,
+      required this.onTap,
+      required this.subtitle,
+      required this.lastMessageUserID,
+      required this.receiverID,
+      required this.noMessagesYet});
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+    bool isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+
+    bool isYou = lastMessageUserID == receiverID;
 
     return GestureDetector(
       onTap: onTap,
@@ -25,18 +39,37 @@ class UserTile extends StatelessWidget {
           children: [
             Icon(
               Icons.account_circle_rounded,
-              color: isDarkMode ? Colors.grey[200] : Theme.of(context).colorScheme.primary,
+              color: isDarkMode
+                  ? Colors.grey[200]
+                  : Theme.of(context).colorScheme.primary,
               size: 40,
             ),
             const SizedBox(
               width: 24,
             ),
-            Text(
-              text,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                  fontSize: 18),
-            ),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                      fontSize: 18),
+                ),
+                Text(
+                  noMessagesYet ? 'No messages yet' : (isYou ? subtitle : 'You: $subtitle'),
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .inversePrimary
+                        .withOpacity(0.7),
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            )),
           ],
         ),
       ),

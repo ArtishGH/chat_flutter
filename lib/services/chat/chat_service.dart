@@ -19,6 +19,59 @@ class ChatService {
     });
   }
 
+  Future<String?> getLastMessageUser(String receiverID) async {
+    // Get current user ID
+    final String currentUserID = _auth.currentUser!.uid;
+
+    // Construct chat room ID
+    List<String> ids = [currentUserID, receiverID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    // Query the last message in the chat room
+    QuerySnapshot querySnapshot = await _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("messages")
+        .orderBy("timestamp", descending: true)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Extract the last message and sender's ID
+      var lastMessage = querySnapshot.docs.first;
+      String senderID = lastMessage["senderID"];
+
+      return senderID;
+    }
+
+    return null;
+  }
+
+  Future<String?> getLastMessage(String receiverID) async {
+    // Get current user ID
+    final String currentUserID = _auth.currentUser!.uid;
+
+    // Construct chat room ID
+    List<String> ids = [currentUserID, receiverID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    // Query the last message in the chat room
+    QuerySnapshot querySnapshot = await _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("messages")
+        .orderBy("timestamp", descending: true)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first["message"];
+    }
+    return null;
+  }
+
   // send a message
   Future<void> sendMessage(String receiverID, message) async {
     // get current user info
