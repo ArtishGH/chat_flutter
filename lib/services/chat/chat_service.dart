@@ -19,8 +19,7 @@ class ChatService {
     });
   }
 
-  Future<String?> getLastMessageUser(String receiverID) async {
-    // Get current user ID
+  Stream<String?> getLastMessageUser(String receiverID) {
     final String currentUserID = _auth.currentUser!.uid;
 
     // Construct chat room ID
@@ -28,28 +27,22 @@ class ChatService {
     ids.sort();
     String chatRoomID = ids.join('_');
 
-    // Query the last message in the chat room
-    QuerySnapshot querySnapshot = await _firestore
+    return _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
         .collection("messages")
         .orderBy("timestamp", descending: true)
         .limit(1)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      // Extract the last message and sender's ID
-      var lastMessage = querySnapshot.docs.first;
-      String senderID = lastMessage["senderID"];
-
-      return senderID;
-    }
-
-    return null;
+        .snapshots()
+        .map((querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first["senderID"] as String?;
+      }
+      return null;
+    });
   }
 
-  Future<String?> getLastMessage(String receiverID) async {
-    // Get current user ID
+  Stream<String?> getLastMessage(String receiverID) {
     final String currentUserID = _auth.currentUser!.uid;
 
     // Construct chat room ID
@@ -57,19 +50,19 @@ class ChatService {
     ids.sort();
     String chatRoomID = ids.join('_');
 
-    // Query the last message in the chat room
-    QuerySnapshot querySnapshot = await _firestore
+    return _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
         .collection("messages")
         .orderBy("timestamp", descending: true)
         .limit(1)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first["message"];
-    }
-    return null;
+        .snapshots()
+        .map((querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first["message"] as String?;
+      }
+      return null;
+    });
   }
 
   // send a message

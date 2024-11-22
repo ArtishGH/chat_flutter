@@ -7,8 +7,7 @@ class UserTile extends StatelessWidget {
   final String text;
   final String subtitle;
   final void Function()? onTap;
-  final String lastMessageUserID;
-  final String receiverID;
+  final bool isYou;
   final bool noMessagesYet;
 
   const UserTile(
@@ -16,16 +15,13 @@ class UserTile extends StatelessWidget {
       required this.text,
       required this.onTap,
       required this.subtitle,
-      required this.lastMessageUserID,
-      required this.receiverID,
+      required this.isYou,
       required this.noMessagesYet});
 
   @override
   Widget build(BuildContext context) {
     bool isDarkMode =
         Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
-
-    bool isYou = lastMessageUserID == receiverID;
 
     return GestureDetector(
       onTap: onTap,

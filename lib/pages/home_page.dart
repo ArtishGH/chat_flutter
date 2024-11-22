@@ -18,7 +18,10 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        foregroundColor: Theme
+            .of(context)
+            .colorScheme
+            .inversePrimary,
         title: const Text('U S E R S'),
         elevation: 0,
       ),
@@ -47,49 +50,52 @@ class HomePage extends StatelessWidget {
         });
   }
 
-  Widget _buildUserListItem(
-      Map<String, dynamic> userData, BuildContext context) {
+  Widget _buildUserListItem(Map<String, dynamic> userData,
+      BuildContext context) {
     // Skip the currently logged-in user
     if (userData["email"] == _authService.getCurrentUser()!.email) {
       return Container();
     }
 
-    return FutureBuilder<String?>(
-      future: _chatService.getLastMessage(userData["uid"]),
+    return StreamBuilder<String?>(
+      stream: _chatService.getLastMessage(userData["uid"]),
       builder: (context, snapshot) {
         String lastMessage = snapshot.connectionState == ConnectionState.waiting
             ? "Loading..."
             : snapshot.data ?? "No messages yet";
         bool noMessagesYet = snapshot.data == null;
-        return FutureBuilder(
-          future: _chatService.getLastMessageUser(userData["uid"]),
+
+        return StreamBuilder<String?>(
+          stream: _chatService.getLastMessageUser(userData["uid"]),
           builder: (context, snapshot) {
-            String lastMessageUserID = "Unknown";
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.data != null) {
-              lastMessageUserID = snapshot.data ?? "Unknown";
-            }
-            return UserTile(
-              text: userData["email"],
-              subtitle: lastMessage,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatPage(
+            String lastMessageUserID = snapshot.connectionState ==
+                ConnectionState.done ? 'Loading...' : snapshot.data ??
+                "Unknown";
+            bool isYou = lastMessageUserID == userData["uid"];
+
+          return UserTile(
+        text: userData["email"],
+          subtitle: lastMessage,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ChatPage(
                       receiverEmail: userData["email"],
                       receiverID: userData["uid"],
                     ),
-                  ),
-                );
-              },
-              lastMessageUserID: lastMessageUserID,
-              receiverID: userData["uid"],
-              noMessagesYet: noMessagesYet,
+              ),
             );
           },
+          isYou: isYou,
+          noMessagesYet: noMessagesYet,
         );
       },
     );
   }
-}
+
+  ,
+
+  );
+}}
