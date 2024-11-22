@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../themes/theme_provider.dart';
 
 class MyButton extends StatelessWidget {
   final String buttonText;
@@ -8,6 +11,9 @@ class MyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -18,7 +24,7 @@ class MyButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 24),
         padding: const EdgeInsets.all(24),
         child: Center(
-          child: Text(buttonText),
+          child: Text(buttonText, style: TextStyle(color: isDarkMode ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary, fontSize: 16),),
         ),
       ),
     );

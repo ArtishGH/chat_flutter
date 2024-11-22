@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import '../services/auth/auth_service.dart';
+import '../themes/theme_provider.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -39,8 +40,8 @@ class LoginPage extends StatelessWidget {
         children: [
           // logo
           Icon(
-            Icons.message,
-            size: 60,
+            Icons.mail_rounded,
+            size: 120,
             color: Theme.of(context).colorScheme.primary,
           ),
 
