@@ -18,10 +18,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: Theme
-            .of(context)
-            .colorScheme
-            .inversePrimary,
+        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('U S E R S'),
         elevation: 0,
       ),
@@ -50,8 +47,8 @@ class HomePage extends StatelessWidget {
         });
   }
 
-  Widget _buildUserListItem(Map<String, dynamic> userData,
-      BuildContext context) {
+  Widget _buildUserListItem(
+      Map<String, dynamic> userData, BuildContext context) {
     // Skip the currently logged-in user
     if (userData["email"] == _authService.getCurrentUser()!.email) {
       return Container();
@@ -68,34 +65,40 @@ class HomePage extends StatelessWidget {
         return StreamBuilder<String?>(
           stream: _chatService.getLastMessageUser(userData["uid"]),
           builder: (context, snapshot) {
-            String lastMessageUserID = snapshot.connectionState ==
-                ConnectionState.done ? 'Loading...' : snapshot.data ??
-                "Unknown";
+            String lastMessageUserID =
+                snapshot.connectionState == ConnectionState.done
+                    ? 'Loading...'
+                    : snapshot.data ?? "Unknown";
             bool isYou = lastMessageUserID == userData["uid"];
 
-          return UserTile(
-        text: userData["email"],
-          subtitle: lastMessage,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ChatPage(
-                      receiverEmail: userData["email"],
-                      receiverID: userData["uid"],
-                    ),
-              ),
-            );
+            return StreamBuilder(
+                stream: _chatService.getUnreadMessages(userData["uid"]),
+                builder: (context, snapshot) {
+                  int unreadCount = snapshot.data ?? 0;
+                  print(unreadCount);
+
+                  return UserTile(
+                    text: userData["email"],
+                    subtitle: lastMessage,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            receiverEmail: userData["email"],
+                            receiverID: userData["uid"],
+                          ),
+                        ),
+                      );
+                    },
+                    isYou: isYou,
+                    noMessagesYet: noMessagesYet,
+                    unreadCount: unreadCount,
+                  );
+                });
           },
-          isYou: isYou,
-          noMessagesYet: noMessagesYet,
         );
       },
     );
   }
-
-  ,
-
-  );
-}}
+}

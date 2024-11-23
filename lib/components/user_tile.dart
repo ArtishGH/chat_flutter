@@ -9,6 +9,7 @@ class UserTile extends StatelessWidget {
   final void Function()? onTap;
   final bool isYou;
   final bool noMessagesYet;
+  final int unreadCount;
 
   const UserTile(
       {super.key,
@@ -16,7 +17,8 @@ class UserTile extends StatelessWidget {
       required this.onTap,
       required this.subtitle,
       required this.isYou,
-      required this.noMessagesYet});
+      required this.noMessagesYet,
+      required this.unreadCount});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,9 @@ class UserTile extends StatelessWidget {
                       fontSize: 18),
                 ),
                 Text(
-                  noMessagesYet ? 'No messages yet' : (isYou ? subtitle : 'You: $subtitle'),
+                  noMessagesYet
+                      ? 'No messages yet'
+                      : (isYou ? subtitle : 'You: $subtitle'),
                   style: TextStyle(
                     color: Theme.of(context)
                         .colorScheme
@@ -66,6 +70,7 @@ class UserTile extends StatelessWidget {
                 ),
               ],
             )),
+            Text(unreadCount.toString())
           ],
         ),
       ),

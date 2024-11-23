@@ -78,7 +78,8 @@ class ChatService {
         senderEmail: currentUserEmail,
         receiverID: receiverID,
         message: message,
-        timestamp: timestamp);
+        timestamp: timestamp,
+        isRead: false);
 
     // construct chat room ID
     List<String> ids = [currentUserID, receiverID];
@@ -99,11 +100,45 @@ class ChatService {
     ids.sort();
     String chatRoomID = ids.join('_');
 
+    // Listen to the message snapshots
     return _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
         .collection("messages")
         .orderBy("timestamp", descending: false)
-        .snapshots();
+        .snapshots()
+        .map((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        // Check if the message is unread
+        if (!(doc.data()['isRead'] ?? false)) {
+          // Update the document to set isRead to true
+          _firestore
+              .collection("chat_rooms")
+              .doc(chatRoomID)
+              .collection("messages")
+              .doc(doc.id)
+              .update({'isRead': true});
+        }
+      }
+      return querySnapshot; // Pass the original QuerySnapshot
+    });
+  }
+
+  Stream<int> getUnreadMessages(String receiverID) {
+    final String currentUserID = _auth.currentUser!.uid;
+
+    // Construct chat room ID
+    List<String> ids = [currentUserID, receiverID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    return _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("messages")
+        .where("isRead", isEqualTo: false)
+        .where("receiverID", isEqualTo: currentUserID)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
   }
 }
