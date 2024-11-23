@@ -107,12 +107,12 @@ class ChatService {
         .collection("messages")
         .orderBy("timestamp", descending: false)
         .snapshots()
-        .map((querySnapshot) {
+        .asyncMap((querySnapshot) async {
       for (var doc in querySnapshot.docs) {
         // Check if the message is unread
-        if (!(doc.data()['isRead'] ?? false)) {
+        if (!(doc.data()['isRead'] ?? false) && doc.data()['receiverID'] == otherUserID) {
           // Update the document to set isRead to true
-          _firestore
+          await _firestore
               .collection("chat_rooms")
               .doc(chatRoomID)
               .collection("messages")

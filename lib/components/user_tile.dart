@@ -24,6 +24,7 @@ class UserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDarkMode =
         Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+    bool isUnread = unreadCount > 0;
 
     return GestureDetector(
       onTap: onTap,
@@ -58,7 +59,7 @@ class UserTile extends StatelessWidget {
                 Text(
                   noMessagesYet
                       ? 'No messages yet'
-                      : (isYou ? subtitle : 'You: $subtitle'),
+                      : (isYou ? (subtitle) : 'You: $subtitle'),
                   style: TextStyle(
                     color: Theme.of(context)
                         .colorScheme
