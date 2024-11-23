@@ -66,15 +66,41 @@ class UserTile extends StatelessWidget {
                         .inversePrimary
                         .withOpacity(0.7),
                     fontSize: 14,
+                    fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             )),
-            Text(unreadCount.toString())
+            _buildNotification(context, unreadCount)
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNotification(BuildContext context, int unreadCount) {
+    bool isUnread = unreadCount > 0;
+
+    return Row(
+      children: [
+        if (isUnread)
+          Icon(
+            Icons.notifications_rounded,
+            color: Theme.of(context).colorScheme.inversePrimary,
+          ),
+        if (isUnread)
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Text(
+              unreadCount.toString(),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
