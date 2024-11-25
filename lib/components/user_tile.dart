@@ -59,14 +59,14 @@ class UserTile extends StatelessWidget {
                 Text(
                   noMessagesYet
                       ? 'No messages yet'
-                      : (isYou ? (subtitle) : 'You: $subtitle'),
+                      : (isYou ? (isUnread ? '» $subtitle' : subtitle) : 'You: $subtitle'),
                   style: TextStyle(
                     color: Theme.of(context)
                         .colorScheme
                         .inversePrimary
                         .withOpacity(0.7),
                     fontSize: 14,
-                    fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isUnread ? FontWeight.w800 : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -89,7 +89,7 @@ class UserTile extends StatelessWidget {
             Icons.notifications_rounded,
             color: Theme.of(context).colorScheme.inversePrimary,
           ),
-        if (isUnread)
+        if (isUnread && unreadCount > 1)
           Padding(
             padding: const EdgeInsets.only(left: 4.0),
             child: Text(
